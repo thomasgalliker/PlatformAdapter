@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformAdapter.NuGet", "Pl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformAdapter", "PlatformAdapter\PlatformAdapter.csproj", "{A18EF889-4AB3-4D21-8965-2C13ABBDF297}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformAdapter.Tests.PlatformDemoAssembly", "PlatformAdapter.Tests.PlatformDemoAssembly\PlatformAdapter.Tests.PlatformDemoAssembly.csproj", "{C53083FF-7611-45EA-8847-C6830C3E23A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformAdapter.Tests.PlatformDemoAbstraction", "PlatformAdapter.Tests.PlatformDemoAbstraction\PlatformAdapter.Tests.PlatformDemoAbstraction.csproj", "{AFD2E0FC-68A3-4988-AD8D-7640826A2CF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{A18EF889-4AB3-4D21-8965-2C13ABBDF297}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A18EF889-4AB3-4D21-8965-2C13ABBDF297}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A18EF889-4AB3-4D21-8965-2C13ABBDF297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C53083FF-7611-45EA-8847-C6830C3E23A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C53083FF-7611-45EA-8847-C6830C3E23A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C53083FF-7611-45EA-8847-C6830C3E23A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C53083FF-7611-45EA-8847-C6830C3E23A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFD2E0FC-68A3-4988-AD8D-7640826A2CF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFD2E0FC-68A3-4988-AD8D-7640826A2CF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFD2E0FC-68A3-4988-AD8D-7640826A2CF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFD2E0FC-68A3-4988-AD8D-7640826A2CF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -80,7 +80,7 @@ namespace PlatformAdapter
                 {
                     if (throwIfNotFound)
                     {
-                        string errorMessage = string.Format("Platform-specific assembly which implements interface {0} could not be found. Make sure your project references all necessary platform-specific assemblies.", interfaceType.FullName);
+                        string errorMessage = string.Format("Platform-specific assembly provides an implementation for interface {0} could not be found. Make sure your project references all necessary platform-specific assemblies.", interfaceType.FullName);
                         throw new PlatformSpecificAssemblyNotFoundException(errorMessage);
                     }
                 }

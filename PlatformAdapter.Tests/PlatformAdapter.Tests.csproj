@@ -74,17 +74,23 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Stubs\IPlatformServices.cs" />
-    <Compile Include="Stubs\IServiceWithNoImplementation.cs" />
-    <Compile Include="Stubs\PlatformServicesStub.cs" />
+    <Compile Include="PlatformAdapterTests.cs" />
     <Compile Include="ProbingAdapterResolverTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Stubs\TestRegistrationConvention.cs" />
+    <Compile Include="TestRegistrationConvention.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PlatformAdapter.Tests.PlatformDemoAbstraction\PlatformAdapter.Tests.PlatformDemoAbstraction.csproj">
+      <Project>{afd2e0fc-68a3-4988-ad8d-7640826a2cf0}</Project>
+      <Name>PlatformAdapter.Tests.PlatformDemoAbstraction</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PlatformAdapter.Tests.PlatformDemoAssembly\PlatformAdapter.Tests.PlatformDemoAssembly.csproj">
+      <Project>{c53083ff-7611-45ea-8847-c6830c3e23a0}</Project>
+      <Name>PlatformAdapter.Tests.PlatformDemoAssembly</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PlatformAdapter\PlatformAdapter.csproj">
       <Project>{a18ef889-4ab3-4d21-8965-2c13abbdf297}</Project>
       <Name>PlatformAdapter</Name>
