@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>PlatformAdapter</id>
+    <version>1.0.0</version>
+    <title>PlatformAdapter</title>
+    <authors>Thomas Galliker</authors>
+    <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
+    <projectUrl>https://github.com/thomasgalliker/PlatformAdapter/</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/thomasgalliker/PlatformAdapter/master/PlatformAdapter.NuGet/PlatformAdapterIcon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>
+      PlatformAdapter helps to adapt between platform-independent and platform-specific assemblies at runtime.
+    </summary>
+    <description>
+      PlatformAdapter helps to adapt between platform-independent and platform-specific assemblies at runtime.
+    </description>
+	<tags>
+    PlatformAdapter adapter platform assembly
+    windows phone winphone wp8 wpa81 win81 windowsphone android xamarin.forms xamarin.ios ios monoandroid monodroid monotouch mvvmcross mvvmlight
+  </tags>
+    <releaseNotes>
+      - Initial pre-release
+    </releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <language>en-US</language>
+    <dependencies>
+      <!--No dependencies-->
+    </dependencies>
+  </metadata>
+  <files>
+    <!--PCL-->
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.dll" target="lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\PlatformAdapter.dll" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.xml" target="lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\PlatformAdapter.xml" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.pdb" target="lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\PlatformAdapter.pdb" />
+
+    <!--Xamarin.Android-->
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.dll" target="lib\MonoAndroid10\PlatformAdapter.dll" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.xml" target="lib\MonoAndroid10\PlatformAdapter.xml" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.pdb" target="lib\MonoAndroid10\PlatformAdapter.pdb" />
+
+    <!--Xamarin.iOS Classic API-->
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.dll" target="lib\MonoTouch10\PlatformAdapter.dll" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.xml" target="lib\MonoTouch10\PlatformAdapter.xml" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.pdb" target="lib\MonoTouch10\PlatformAdapter.pdb" />
+
+    <!--Xamarin.iOS Unified API-->
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.dll" target="lib\xamarin.ios10\PlatformAdapter.dll" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.xml" target="lib\xamarin.ios10\PlatformAdapter.xml" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.pdb" target="lib\xamarin.ios10\PlatformAdapter.pdb" />
+
+    <!--Windows Phone 8-->
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.dll" target="lib\wp8\PlatformAdapter.dll" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.xml" target="lib\wp8\PlatformAdapter.xml" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.pdb" target="lib\wp8\PlatformAdapter.pdb" />
+
+    <!--Windows Phone 8.1-->
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.dll" target="lib\wpa81\PlatformAdapter.dll" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.xml" target="lib\wpa81\PlatformAdapter.xml" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.pdb" target="lib\wpa81\PlatformAdapter.pdb" />
+    
+    <!--Windows Store-->
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.dll" target="lib\win81\PlatformAdapter.dll" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.xml" target="lib\win81\PlatformAdapter.xml" />
+    <file src="..\PlatformAdapter\bin\Release\PlatformAdapter.pdb" target="lib\win81\PlatformAdapter.pdb" />
+
+    <file src="tools\init.ps1" target="tools\init.ps1" />
+    <file src="tools\install.ps1" target="tools\install.ps1" />
+    <file src="tools\uninstall.ps1" target="tools\uninstall.ps1" />
+  </files>
+</package>
