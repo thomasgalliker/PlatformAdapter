@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 
+using Guards;
+
 namespace CrossPlatformAdapter
 {
     /// <summary>
@@ -17,9 +19,9 @@ namespace CrossPlatformAdapter
 
         public virtual string InterfaceToClassNamingConvention(Type interfaceType)
         {
-            ////Guard.ArgumentIsTrue(() => interfaceType.GetTypeInfo().IsInterface);
-            ////Guard.ArgumentIsTrue(() => interfaceType.DeclaringType == null);
-            ////Guard.ArgumentIsTrue(() => interfaceType.Name.StartsWith("I", StringComparison.Ordinal));
+            Guard.ArgumentMustBeInterface(interfaceType);
+            Guard.ArgumentIsTrue(() => interfaceType.DeclaringType == null);
+            Guard.ArgumentIsTrue(() => interfaceType.Name.StartsWith("I", StringComparison.Ordinal));
 
             return string.Format("{0}.{1}", interfaceType.Namespace, interfaceType.Name.Substring(1));
         }

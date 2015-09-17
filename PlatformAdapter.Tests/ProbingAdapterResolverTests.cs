@@ -18,6 +18,64 @@ namespace PlatformAdapter.Tests
     public class ProbingAdapterResolverTests
     {
         [Fact]
+        public void ShouldResolvePlatformSpecificObjectForInterface()
+        {
+            // Arrange
+            var testRegistrationConvention = new TestRegistrationConvention();
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
+            var interfaceToResolve = typeof(IDemoService);
+
+            // Act
+            var classType = probingAdapterResolver.Resolve(interfaceToResolve);
+
+            // Assert
+            classType.Should().BeOfType<DemoService>();
+        }
+
+        [Fact]
+        public void ShouldResolvePlatformSpecificObjectForInterfaceGeneric()
+        {
+            // Arrange
+            var testRegistrationConvention = new TestRegistrationConvention();
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
+
+            // Act
+            var classType = probingAdapterResolver.Resolve<IDemoService>();
+
+            // Assert
+            classType.Should().BeOfType<DemoService>();
+        }
+
+        [Fact]
+        public void ShouldReturnNullWhenTryResolveFails()
+        {
+            // Arrange
+            var testRegistrationConvention = new TestRegistrationConvention();
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
+            var interfaceToResolve = typeof(IDemoServiceWithNoImplementation);
+
+            // Act
+            var instance = probingAdapterResolver.TryResolve(interfaceToResolve);
+
+            // Assert
+            instance.Should().BeNull();
+        }
+
+        [Fact]
+        public void ShouldReturnNullWhenTryResolveFailsGeneric()
+        {
+            // Arrange
+            var testRegistrationConvention = new TestRegistrationConvention();
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
+
+            // Act
+            var instance = probingAdapterResolver.TryResolve<IDemoServiceWithNoImplementation>();
+
+            // Assert
+            instance.Should().BeNull();
+        }
+
+        [Fact]
         public void ShouldResolvePlatformSpecificClassTypeForInterface()
         {
             // Arrange
@@ -27,6 +85,20 @@ namespace PlatformAdapter.Tests
 
             // Act
             var classType = probingAdapterResolver.ResolveClassType(interfaceToResolve);
+
+            // Assert
+            classType.Should().Be<DemoService>();
+        }
+
+        [Fact]
+        public void ShouldResolvePlatformSpecificClassTypeForInterfaceGeneric()
+        {
+            // Arrange
+            var testRegistrationConvention = new TestRegistrationConvention();
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
+
+            // Act
+            var classType = probingAdapterResolver.ResolveClassType<IDemoService>();
 
             // Assert
             classType.Should().Be<DemoService>();
@@ -49,14 +121,27 @@ namespace PlatformAdapter.Tests
         }
 
         [Fact]
-        public void ShouldNotThrowAnyExceptionIfFlagIsSet()
+        public void ShouldReturnNullWhenTryResolveClassTypeFails()
         {
             // Arrange
-            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultRegistrationConvention which doesnt work with unit tests
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultRegistrationConvention which doesnt work with these unit tests
             var interfaceToResolve = typeof(IDemoService);
 
             // Act
             var classType = probingAdapterResolver.TryResolveClassType(interfaceToResolve);
+
+            // Assert
+            classType.Should().BeNull();
+        }
+
+        [Fact]
+        public void ShouldReturnNullWhenTryResolveClassTypeFailsGeneric()
+        {
+            // Arrange
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultRegistrationConvention which doesnt work with these unit tests
+
+            // Act
+            var classType = probingAdapterResolver.TryResolveClassType<IDemoService>();
 
             // Assert
             classType.Should().BeNull();

@@ -42,25 +42,30 @@ namespace CrossPlatformAdapter
         public IRegistrationConvention RegistrationConvention { get; set; }
 
         /// <inheritdoc />
-        public object Resolve<TInterface>(params object[] args)
+        public TInterface Resolve<TInterface>(params object[] args)
         {
-            return this.Resolve(typeof(TInterface), args);
+            return (TInterface)this.Resolve(typeof(TInterface), args);
         }
 
         /// <inheritdoc />
         public object Resolve(Type interfaceType, params object[] args)
         {
-            return this.Resolve(interfaceType, args, throwIfNotFound: true);
+            return this.Resolve(interfaceType, throwIfNotFound: true, args: args);
+        }
+
+        public TInterface TryResolve<TInterface>(params object[] args)
+        {
+            return (TInterface)this.TryResolve(typeof(TInterface), args);
         }
 
         /// <inheritdoc />
         public object TryResolve(Type interfaceType, params object[] args)
         {
-            return this.Resolve(interfaceType, args, throwIfNotFound: false);
+            return this.Resolve(interfaceType, throwIfNotFound: false, args: args);
         }
 
         /// <inheritdoc />
-        private object Resolve(Type interfaceType, IEnumerable<object> args, bool throwIfNotFound)
+        private object Resolve(Type interfaceType, bool throwIfNotFound, params object[] args)
         {
             Guard.ArgumentNotNull(() => interfaceType);
 
@@ -73,7 +78,7 @@ namespace CrossPlatformAdapter
             return this.CreateInstance(classType, throwIfNotFound, args);
         }
 
-        private object CreateInstance(Type type, bool throwIfCannotCreate, IEnumerable<object> args)
+        private object CreateInstance(Type type, bool throwIfCannotCreate, params object[] args)
         {
             try
             {
@@ -91,9 +96,21 @@ namespace CrossPlatformAdapter
         }
 
         /// <inheritdoc />
+        public Type ResolveClassType<TInterface>()
+        {
+            return this.ResolveClassType(typeof(TInterface));
+        }
+
+        /// <inheritdoc />
         public Type ResolveClassType(Type interfaceType)
         {
             return this.DoResolveClassType(interfaceType, throwIfNotFound: true);
+        }
+
+        /// <inheritdoc />
+        public Type TryResolveClassType<TInterface>()
+        {
+            return this.TryResolveClassType(typeof(TInterface));
         }
 
         /// <inheritdoc />
@@ -165,10 +182,10 @@ namespace CrossPlatformAdapter
             AssemblyName assemblyName = new AssemblyName(interfaceType.GetTypeInfo().Assembly.FullName);
             assemblyName.Name = this.RegistrationConvention.PlatformNamingConvention(assemblyName);
 
-            Assembly assm = null;
+            Assembly platformSpecificAssembly = null;
             try
             {
-                assm = this.assemblyLoader(assemblyName);
+                platformSpecificAssembly = this.assemblyLoader(assemblyName);
             }
             catch (Exception)
             {
@@ -179,14 +196,14 @@ namespace CrossPlatformAdapter
 
                 try
                 {
-                    assm = this.assemblyLoader(assemblyName);
+                    platformSpecificAssembly = this.assemblyLoader(assemblyName);
                 }
                 catch (Exception)
                 {
                 }
             }
 
-            return assm;
+            return platformSpecificAssembly;
         }
     }
 }
