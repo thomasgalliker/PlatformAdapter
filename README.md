@@ -28,7 +28,7 @@ Type photoCameraType = PlatformAdapter.Current.ResolveClassType<IPhotoCamera>();
 If you have a plattform-agnostic interface, e.g. IPhotoCamera, and you want PlatformAdapter to return a concrete object of the platform-specific implementation, issue the following command: 
 
 ``` 
-Type photoCameraType = PlatformAdapter.Current.Resolve<IPhotoCamera>(); 
+IPhotoCamera photoCamera = PlatformAdapter.Current.Resolve<IPhotoCamera>(); 
 ``` 
 Recommendation of the author: It is highly recommended to delegate the taks of dependeny management to an IoC framework, e.g. Autofac, Unity, SimpleIoc, etc. PlatformAdapter does only provide very basic  
 
