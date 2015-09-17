@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 
+using CrossPlatformAdapter;
+
 namespace PlatformAdapter.Tests
 {
     /// <summary>

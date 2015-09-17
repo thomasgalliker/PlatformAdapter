@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
 
+using CrossPlatformAdapter;
+using CrossPlatformAdapter.Exceptions;
+
 using FluentAssertions;
 
 using Moq;
 
-using PlatformAdapter.Exceptions;
 using PlatformAdapter.Tests.PlatformDemoAbstraction;
 using PlatformAdapter.Tests.PlatformDemoAssembly;
 
@@ -20,7 +22,7 @@ namespace PlatformAdapter.Tests
         {
             // Arrange
             var testRegistrationConvention = new TestRegistrationConvention();
-            var probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
             var interfaceToResolve = typeof(IDemoService);
 
             // Act
@@ -35,7 +37,7 @@ namespace PlatformAdapter.Tests
         {
             // Arrange
             var registrationConventionMock = new Mock<IRegistrationConvention>();
-            var probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
             var interfaceToResolve = typeof(IDemoService);
 
             // Act
@@ -50,12 +52,11 @@ namespace PlatformAdapter.Tests
         public void ShouldNotThrowAnyExceptionIfFlagIsSet()
         {
             // Arrange
-            const bool ThrowIfNotFound = false;
-            var probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultRegistrationConvention which doesnt work with unit tests
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultRegistrationConvention which doesnt work with unit tests
             var interfaceToResolve = typeof(IDemoService);
 
             // Act
-            var classType = probingAdapterResolver.ResolveClassType(interfaceToResolve, ThrowIfNotFound);
+            var classType = probingAdapterResolver.TryResolveClassType(interfaceToResolve);
 
             // Assert
             classType.Should().BeNull();
@@ -66,7 +67,7 @@ namespace PlatformAdapter.Tests
         {
             // Arrange
             var registrationConventionMock = new Mock<IRegistrationConvention>();
-            var probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
             var interfaceToResolve = typeof(IDemoService);
 
             // Act
@@ -86,7 +87,7 @@ namespace PlatformAdapter.Tests
             registrationConventionMock.Setup(registrationConvention => registrationConvention.InterfaceToClassNamingConvention(It.IsAny<Type>()))
                 .Returns((Type t) => "TypeWhichDoesNotExist");
 
-            var probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
             var interfaceToResolve = typeof(IDemoServiceWithNoImplementation);
 
             // Act

@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+
+using CrossPlatformAdapter.Exceptions;
 
 using Guards;
 
-using PlatformAdapter.Exceptions;
-
-namespace PlatformAdapter
+namespace CrossPlatformAdapter
 {
     // An implementation IAdapterResolver that probes for platforms-specific adapters by dynamically
     // looking for concrete types in platform-specific assemblies.
@@ -37,13 +38,33 @@ namespace PlatformAdapter
             this.assemblyLoader = assemblyLoader;
         }
 
+        /// <inheritdoc />
         public IRegistrationConvention RegistrationConvention { get; set; }
 
-        public object Resolve(Type interfaceType, bool throwIfNotFound, object[] args)
+        /// <inheritdoc />
+        public object Resolve<TInterface>(params object[] args)
+        {
+            return this.Resolve(typeof(TInterface), args);
+        }
+
+        /// <inheritdoc />
+        public object Resolve(Type interfaceType, params object[] args)
+        {
+            return this.Resolve(interfaceType, args, throwIfNotFound: true);
+        }
+
+        /// <inheritdoc />
+        public object TryResolve(Type interfaceType, params object[] args)
+        {
+            return this.Resolve(interfaceType, args, throwIfNotFound: false);
+        }
+
+        /// <inheritdoc />
+        private object Resolve(Type interfaceType, IEnumerable<object> args, bool throwIfNotFound)
         {
             Guard.ArgumentNotNull(() => interfaceType);
 
-            var classType = this.ResolveClassType(interfaceType, throwIfNotFound);
+            var classType = this.DoResolveClassType(interfaceType, throwIfNotFound);
             if (classType == null)
             {
                 return null;
@@ -52,7 +73,7 @@ namespace PlatformAdapter
             return this.CreateInstance(classType, throwIfNotFound, args);
         }
 
-        private object CreateInstance(Type type, bool throwIfCannotCreate, object[] args)
+        private object CreateInstance(Type type, bool throwIfCannotCreate, IEnumerable<object> args)
         {
             try
             {
@@ -69,7 +90,19 @@ namespace PlatformAdapter
             return null;
         }
 
-        public Type ResolveClassType(Type interfaceType, bool throwIfNotFound = true)
+        /// <inheritdoc />
+        public Type ResolveClassType(Type interfaceType)
+        {
+            return this.DoResolveClassType(interfaceType, throwIfNotFound: true);
+        }
+
+        /// <inheritdoc />
+        public Type TryResolveClassType(Type interfaceType)
+        {
+            return this.DoResolveClassType(interfaceType, throwIfNotFound: false);
+        }
+
+        private Type DoResolveClassType(Type interfaceType, bool throwIfNotFound = true)
         {
             Guard.ArgumentNotNull(() => interfaceType);
 

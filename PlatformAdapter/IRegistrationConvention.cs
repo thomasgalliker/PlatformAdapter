@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace PlatformAdapter
+namespace CrossPlatformAdapter
 {
     /// <summary>
     /// IRegistrationConvention interface is used to define conversion rules

@@ -8,7 +8,7 @@
     <ProjectGuid>{A18EF889-4AB3-4D21-8965-2C13ABBDF297}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PlatformAdapter</RootNamespace>
+    <RootNamespace>CrossPlatformAdapter</RootNamespace>
     <AssemblyName>PlatformAdapter</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>

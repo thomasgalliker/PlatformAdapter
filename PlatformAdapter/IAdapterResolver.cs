@@ -1,19 +1,77 @@
 ﻿using System;
 
-namespace PlatformAdapter
+namespace CrossPlatformAdapter
 {
     public interface IAdapterResolver
     {
-        object Resolve(Type interfaceType, bool throwIfNotFound, object[] args);
+        /// <summary>
+        /// Resolves a platform-specific object for a given interface type TInterface
+        /// using the configured registration convention.
+        /// </summary>
+        /// <typeparam name="TInterface">
+        /// The platform-agnostic interface type 
+        /// for which we want to find a platform-specific implementation.
+        /// </typeparam>
+        /// <param name="args">Constructor parameters which are eventually needed to create the platform-specific object.</param>
+        /// <returns>The platform-specific object which implements interface type TInterface.</returns>
+        object Resolve<TInterface>(params object[] args);
 
         /// <summary>
-        /// Resolves a class type based on the given interface type.
+        /// Resolves a platform-specific object for a given interface type TInterface
+        /// using the configured registration convention.
         /// </summary>
-        /// <param name="interfaceType">The interface type for which the implementation type is looked up.</param>
-        /// <param name="throwIfNotFound">Throws an exception if class type cannot be found.</param>
-        /// <returns>The class type (if it can be found) or null (if it cannot be found and throwIfNotFound is false).</returns>
-        Type ResolveClassType(Type interfaceType, bool throwIfNotFound = true);
+        /// <param name="interfaceType">
+        /// The platform-agnostic interface type 
+        /// for which we want to find a platform-specific implementation.
+        /// </param>
+        /// <param name="args">Constructor parameters which are eventually needed to create the platform-specific object.</param>
+        /// <returns>The platform-specific object which implements interface type TInterface.</returns>
+        object Resolve(Type interfaceType, params object[] args);
 
+        /// <summary>
+        /// Tries to resolve a platform-specific object for a given interface type TInterface
+        /// using the configured registration convention.
+        /// </summary>
+        /// <param name="interfaceType">
+        /// The platform-agnostic interface type 
+        /// for which we want to find a platform-specific implementation.
+        /// </param>
+        /// <param name="args">Constructor parameters which are eventually needed to create the platform-specific object.</param>
+        /// <returns>
+        /// The platform-specific object which implements the given interface type.
+        /// If the platform-specific assembly or the desired type cannot be found, TryResolve returns null.
+        /// </returns>
+        object TryResolve(Type interfaceType, params object[] args);
+
+        /// <summary>
+        /// Resolves a class type based on the given interface type
+        /// using the configured registration convention.
+        /// </summary>
+        /// <param name="interfaceType">
+        /// The platform-agnostic interface type 
+        /// for which we want to find a platform-specific implementation.
+        /// </param>
+        /// <returns>The platform-specific class type which implements the given interface type.
+        /// </returns>
+        Type ResolveClassType(Type interfaceType);
+
+        /// <summary>
+        /// Resolves a class type based on the given interface type
+        /// using the configured registration convention.
+        /// </summary>
+        /// <param name="interfaceType">
+        /// The platform-agnostic interface type 
+        /// for which we want to find a platform-specific implementation.
+        /// </param>
+        /// <returns>The platform-specific class type which implements the given interface type.
+        /// If the platform-specific assembly or the desired type cannot be found, TryResolve returns null.
+        /// </returns>
+        Type TryResolveClassType(Type interfaceType);
+
+        /// <summary>
+        /// The registration convention to be used to translate the given platform-agnostic interface type
+        /// into a platform-dependent class type.
+        /// </summary>
         IRegistrationConvention RegistrationConvention { get; set; }
     }
 }

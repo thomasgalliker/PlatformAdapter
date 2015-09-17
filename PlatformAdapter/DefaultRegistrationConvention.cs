@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace PlatformAdapter
+namespace CrossPlatformAdapter
 {
     /// <summary>
     /// DefaultRegistrationConvention is a registration convention which adds the string ".Platform"

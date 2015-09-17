@@ -1,4 +1,6 @@
 ﻿
+using CrossPlatformAdapter;
+
 using FluentAssertions;
 
 
@@ -13,7 +15,7 @@ namespace PlatformAdapter.Tests
         public void ShouldGetStaticPlatformAdapter()
         {
             // Act
-            var adapter = PlatformAdapter.Current;
+            var adapter = CrossPlatformAdapter.PlatformAdapter.Current;
 
             // Assert
             adapter.Should().BeOfType<ProbingAdapterResolver>();

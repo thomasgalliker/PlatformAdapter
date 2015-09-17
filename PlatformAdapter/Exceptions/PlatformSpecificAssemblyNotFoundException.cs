@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PlatformAdapter.Exceptions
+namespace CrossPlatformAdapter.Exceptions
 {
     public class PlatformSpecificAssemblyNotFoundException : Exception
     {

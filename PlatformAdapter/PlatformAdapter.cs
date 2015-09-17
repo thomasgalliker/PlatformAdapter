@@ -1,9 +1,14 @@
-﻿
-using System;
+﻿using System;
 using System.Threading;
 
-namespace PlatformAdapter
+namespace CrossPlatformAdapter
 {
+    /// <summary>
+    /// PlatformAdapter provides access to an IAdapterResolver implementation.
+    /// </summary>
+    /// <remarks>
+    /// Consider using a dependency management framework instead of this PlatformAdapter.
+    /// </remarks>
     public static class PlatformAdapter
     {
         private static readonly Lazy<IAdapterResolver> AdapterResolver = new Lazy<IAdapterResolver>(CreateProbingAdapterResolver, LazyThreadSafetyMode.PublicationOnly);
