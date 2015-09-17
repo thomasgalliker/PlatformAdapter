@@ -46,7 +46,7 @@ namespace CrossPlatformAdapter
         /// for unit testing purposes.
         /// </summary>
         /// <param name="resolver"></param>
-        internal static void SetResolver(IAdapterResolver resolver)
+        public static void SetResolver(IAdapterResolver resolver)
         {
             customResolver = resolver;
         }
