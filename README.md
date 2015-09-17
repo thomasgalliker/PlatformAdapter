@@ -1,5 +1,5 @@
 # PlatformAdapter  
-<img src="https://raw.githubusercontent.com/thomasgalliker/PlatformAdapter/master/PlatformAdapter.NuGet/PlatformAdapterIcon.png" alt="PlatformAdapter" align="right"> 
+<img src="https://raw.githubusercontent.com/thomasgalliker/PlatformAdapter/master/PlatformAdapter.NuGet/PlatformAdapterIcon.png" alt="PlatformAdapter" align="right" width="200" height="200"> 
 
 The main goal of PlatformAdapter project is to have a component which allows you to probe from a platform-independent interface to its platform-specific implementation. This functionality is often needed when cross-platform compatible 
 code is written. Abstractions need to be resolved into implementations at runtime. 
