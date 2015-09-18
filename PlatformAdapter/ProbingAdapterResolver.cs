@@ -19,11 +19,13 @@ namespace CrossPlatformAdapter
         private readonly Dictionary<int, IProbingStrategy> probingStrategies;
 
         /// <summary>
-        /// Default constructor.
-        /// Uses DefaultProbingStrategy in order to resolve platform-specific assemblies.
+        /// Default constructor. Uses 
+        /// with priority 1: PlatformProbingStrategy (current assembly + .Platform.dll)
+        /// with priority 2: DefaultProbingStrategy (current assembly)
+        /// in order to resolve platform-specific assemblies.
         /// </summary>
         public ProbingAdapterResolver()
-            : this(Assembly.Load, new DefaultProbingStrategy(), new PlatformProbingStrategy())
+            : this(Assembly.Load, new PlatformProbingStrategy(), new DefaultProbingStrategy())
         {
         }
 
@@ -133,15 +135,20 @@ namespace CrossPlatformAdapter
         private Type DoResolveClassTypeUsingAllStrategies(Type interfaceType, bool throwIfNotFound = true)
         {
             var exceptions = new List<Exception>();
-            foreach (var probingStrategy in this.probingStrategies)
-            {
-                var resolveResult = this.DoResolveClassType(probingStrategy.Value, interfaceType);
-                if (resolveResult.IsSuccessful)
-                {
-                    return resolveResult.Type;
-                }
 
-                exceptions.Add(resolveResult.Exception);
+            lock (this.lockObject)
+            {
+                // Loop through all configured probing strategies and return the first successful result
+                foreach (var probingStrategy in this.probingStrategies)
+                {
+                    var resolveResult = this.DoResolveClassType(probingStrategy.Value, interfaceType);
+                    if (resolveResult.IsSuccessful)
+                    {
+                        return resolveResult.Type;
+                    }
+
+                    exceptions.Add(resolveResult.Exception);
+                }
             }
 
             if (throwIfNotFound)
@@ -166,21 +173,25 @@ namespace CrossPlatformAdapter
                 }
                 else
                 {
-                    var classType = this.TryConvertInterfaceTypeToClassType(probingStrategy, platformSpecificAssembly, interfaceType);
+                    var classTypeName = probingStrategy.InterfaceToClassNamingConvention(interfaceType);
+                    var classType = this.TryConvertInterfaceTypeToClassType(platformSpecificAssembly, classTypeName);
                     if (classType != null)
                     {
                         return new ProbingResult(classType);
                     }
 
-                    string errorMessage = string.Format("Interface type {0} could not be resolved in assembly {1}.", interfaceType.FullName, platformSpecificAssembly.FullName);
+                    string errorMessage = string.Format("Type {0} which is supposed to implement {1} could not be resolved in assembly {2}.", 
+                                            classTypeName, 
+                                            interfaceType.FullName,
+                                            platformSpecificAssembly.FullName);
+
                     return new ProbingResult(new PlatformSpecificTypeNotFoundException(errorMessage));
                 }
             }
         }
 
-        private Type TryConvertInterfaceTypeToClassType(IProbingStrategy probingStrategy, Assembly assembly, Type interfaceType)
+        private Type TryConvertInterfaceTypeToClassType(Assembly assembly, string typeName)
         {
-            string typeName = probingStrategy.InterfaceToClassNamingConvention(interfaceType);
             try
             {
                 return assembly.GetType(typeName);
