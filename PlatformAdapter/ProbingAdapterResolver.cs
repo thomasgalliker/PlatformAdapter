@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using CrossPlatformAdapter.Exceptions;
+using CrossPlatformAdapter.ProbingStrategies;
 
 using Guards;
 
@@ -17,29 +19,30 @@ namespace CrossPlatformAdapter
 
         /// <summary>
         /// Default constructor.
-        /// Uses DefaultRegistrationConvention in order to resolve platform-specific assemblies.
+        /// Uses DefaultProbingStrategy in order to resolve platform-specific assemblies.
         /// </summary>
         public ProbingAdapterResolver()
-            : this(new DefaultRegistrationConvention(), Assembly.Load)
+            : this(Assembly.Load, new DefaultProbingStrategy(), new PlatformProbingStrategy())
         {
         }
 
-        public ProbingAdapterResolver(IRegistrationConvention registrationConvention)
-            : this(registrationConvention, Assembly.Load)
+        public ProbingAdapterResolver(params IProbingStrategy[] probingStrategies)
+            : this(Assembly.Load, probingStrategies)
         {
         }
 
-        public ProbingAdapterResolver(IRegistrationConvention registrationConvention, Func<AssemblyName, Assembly> assemblyLoader)
+        public ProbingAdapterResolver(Func<AssemblyName, Assembly> assemblyLoader, params IProbingStrategy[] probingStrategies)
         {
-            Guard.ArgumentNotNull(() => registrationConvention);
+            Guard.ArgumentNotNull(() => probingStrategies);
             Guard.ArgumentNotNull(() => assemblyLoader);
 
-            this.RegistrationConvention = registrationConvention;
+            int index = 0;
+            this.ProbingStrategies = probingStrategies.ToDictionary(strategy => index++, strategy => strategy);
             this.assemblyLoader = assemblyLoader;
         }
 
         /// <inheritdoc />
-        public IRegistrationConvention RegistrationConvention { get; set; }
+        public Dictionary<int, IProbingStrategy> ProbingStrategies { get; set; }
 
         /// <inheritdoc />
         public TInterface Resolve<TInterface>(params object[] args)
@@ -69,7 +72,7 @@ namespace CrossPlatformAdapter
         {
             Guard.ArgumentNotNull(() => interfaceType);
 
-            var classType = this.DoResolveClassType(interfaceType, throwIfNotFound);
+            var classType = this.DoResolveClassTypeUsingAllStrategies(interfaceType, throwIfNotFound);
             if (classType == null)
             {
                 return null;
@@ -98,13 +101,13 @@ namespace CrossPlatformAdapter
         /// <inheritdoc />
         public Type ResolveClassType<TInterface>()
         {
-            return this.ResolveClassType(typeof(TInterface));
+            return this.DoResolveClassTypeUsingAllStrategies(typeof(TInterface));
         }
 
         /// <inheritdoc />
         public Type ResolveClassType(Type interfaceType)
         {
-            return this.DoResolveClassType(interfaceType, throwIfNotFound: true);
+            return this.DoResolveClassTypeUsingAllStrategies(interfaceType, throwIfNotFound: true);
         }
 
         /// <inheritdoc />
@@ -116,46 +119,60 @@ namespace CrossPlatformAdapter
         /// <inheritdoc />
         public Type TryResolveClassType(Type interfaceType)
         {
-            return this.DoResolveClassType(interfaceType, throwIfNotFound: false);
+            return this.DoResolveClassTypeUsingAllStrategies(interfaceType, throwIfNotFound: false);
         }
 
-        private Type DoResolveClassType(Type interfaceType, bool throwIfNotFound = true)
+        private Type DoResolveClassTypeUsingAllStrategies(Type interfaceType, bool throwIfNotFound = true)
+        {
+            var exceptions = new List<Exception>();
+            foreach (var probingStrategy in this.ProbingStrategies)
+            {
+                var resolveResult = this.DoResolveClassType(probingStrategy.Value, interfaceType, throwIfNotFound);
+                if (resolveResult.IsSuccessful)
+                {
+                    return resolveResult.Type;
+                }
+                
+                exceptions.Add(resolveResult.Exception);
+            }
+
+            if (throwIfNotFound)
+            {
+                throw new AggregateException(exceptions);
+            }
+            
+            return null;
+        }
+
+        private ProbingResult DoResolveClassType(IProbingStrategy probingStrategy, Type interfaceType, bool throwIfNotFound = true)
         {
             Guard.ArgumentNotNull(() => interfaceType);
 
             lock (this.lockObject)
             {
-                var platformSpecificAssembly = this.ProbeForPlatformSpecificAssembly(interfaceType);
+                var platformSpecificAssembly = this.ProbeForPlatformSpecificAssembly(probingStrategy, interfaceType);
                 if (platformSpecificAssembly == null)
                 {
-                    if (throwIfNotFound)
-                    {
-                        string errorMessage = string.Format("Platform-specific assembly provides an implementation for interface {0} could not be found. Make sure your project references all necessary platform-specific assemblies.", interfaceType.FullName);
-                        throw new PlatformSpecificAssemblyNotFoundException(errorMessage);
-                    }
+                    string errorMessage = string.Format("Platform-specific assembly provides an implementation for interface {0} could not be found. Make sure your project references all necessary platform-specific assemblies.", interfaceType.FullName);
+                    return new ProbingResult(new PlatformSpecificAssemblyNotFoundException(errorMessage));
                 }
                 else
                 {
-                    var classType = this.TryConvertInterfaceTypeToClassType(platformSpecificAssembly, interfaceType);
+                    var classType = this.TryConvertInterfaceTypeToClassType(probingStrategy, platformSpecificAssembly, interfaceType);
                     if (classType != null)
                     {
-                        return classType;
+                        return new ProbingResult(classType);
                     }
 
-                    if (throwIfNotFound)
-                    {
-                        string errorMessage = string.Format("Type {0} could not be resolved.", interfaceType.FullName);
-                        throw new PlatformSpecificTypeNotFoundException(errorMessage);
-                    }
+                    string errorMessage = string.Format("Interface type {0} could not be resolved in assembly {1}.", interfaceType.FullName, platformSpecificAssembly.FullName);
+                    return new ProbingResult(new PlatformSpecificTypeNotFoundException(errorMessage));
                 }
-
-                return null;
             }
         }
 
-        private Type TryConvertInterfaceTypeToClassType(Assembly assembly, Type interfaceType)
+        private Type TryConvertInterfaceTypeToClassType(IProbingStrategy probingStrategy, Assembly assembly, Type interfaceType)
         {
-            string typeName = this.RegistrationConvention.InterfaceToClassNamingConvention(interfaceType);
+            string typeName = probingStrategy.InterfaceToClassNamingConvention(interfaceType);
             try
             {
                  return assembly.GetType(typeName);
@@ -177,10 +194,10 @@ namespace CrossPlatformAdapter
             return null;
         }
 
-        private Assembly ProbeForPlatformSpecificAssembly(Type interfaceType)
+        private Assembly ProbeForPlatformSpecificAssembly(IProbingStrategy probingStrategy, Type interfaceType)
         {
             AssemblyName assemblyName = new AssemblyName(interfaceType.GetTypeInfo().Assembly.FullName);
-            assemblyName.Name = this.RegistrationConvention.PlatformNamingConvention(assemblyName);
+            assemblyName.Name = probingStrategy.PlatformNamingConvention(assemblyName);
 
             Assembly platformSpecificAssembly = null;
             try
@@ -204,6 +221,31 @@ namespace CrossPlatformAdapter
             }
 
             return platformSpecificAssembly;
+        }
+
+        private class ProbingResult
+        {
+            public Type Type { get; private set; }
+
+            public Exception Exception { get; private set; }
+
+            public bool IsSuccessful
+            {
+                get
+                {
+                    return this.Type != null;
+                }
+            }
+
+            public ProbingResult(Type type)
+            {
+                this.Type = type;
+            }
+
+            public ProbingResult(Exception exception)
+            {
+                this.Exception = exception;
+            }
         }
     }
 }

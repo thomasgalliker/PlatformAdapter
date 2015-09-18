@@ -34,24 +34,32 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\PlatformAdapter.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>PlatformAdapterKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DefaultRegistrationConvention.cs" />
+    <Compile Include="ProbingStrategies\PlatformProbingStrategy.cs" />
+    <Compile Include="ProbingStrategies\DefaultProbingStrategy.cs" />
     <Compile Include="Exceptions\PlatformSpecificAssemblyNotFoundException.cs" />
     <Compile Include="Exceptions\PlatformSpecificTypeNotFoundException.cs" />
     <Compile Include="IAdapterResolver.cs" />
-    <Compile Include="IRegistrationConvention.cs" />
+    <Compile Include="IProbingStrategy.cs" />
     <Compile Include="PlatformAdapter.cs" />
     <Compile Include="ProbingAdapterResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Guards, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Guards.1.0.0\lib\portable-net45+wp8+wpa81+netcore45+monoandroid1+xamarin.ios10\Guards.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <None Include="packages.config" />
+    <None Include="PlatformAdapterKey.snk" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Reference Include="Guards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ac6aedb73a72f46e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Guards.1.0.2\lib\portable-net45+wp8+wpa81+win81+netcore45+monoandroid10+monotouch10+xamarin.ios10\Guards.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

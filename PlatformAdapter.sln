@@ -8,6 +8,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformAdapter.Tests", "PlatformAdapter.Tests\PlatformAdapter.Tests.csproj", "{41B60091-34AC-4871-887D-CB3E925B80FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformAdapter.NuGet", "PlatformAdapter.NuGet\PlatformAdapter.NuGet.csproj", "{2CF5E868-1098-4C6D-9001-27D8DC0D87BE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A18EF889-4AB3-4D21-8965-2C13ABBDF297} = {A18EF889-4AB3-4D21-8965-2C13ABBDF297}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformAdapter", "PlatformAdapter\PlatformAdapter.csproj", "{A18EF889-4AB3-4D21-8965-2C13ABBDF297}"
 EndProject

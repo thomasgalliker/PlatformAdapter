@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 
 using CrossPlatformAdapter;
@@ -21,7 +22,7 @@ namespace PlatformAdapter.Tests
         public void ShouldResolvePlatformSpecificObjectForInterface()
         {
             // Arrange
-            var testRegistrationConvention = new TestRegistrationConvention();
+            var testRegistrationConvention = new TestProbingStrategy();
             IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
             var interfaceToResolve = typeof(IDemoService);
 
@@ -36,7 +37,7 @@ namespace PlatformAdapter.Tests
         public void ShouldResolvePlatformSpecificObjectForInterfaceGeneric()
         {
             // Arrange
-            var testRegistrationConvention = new TestRegistrationConvention();
+            var testRegistrationConvention = new TestProbingStrategy();
             IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
 
             // Act
@@ -50,7 +51,7 @@ namespace PlatformAdapter.Tests
         public void ShouldReturnNullWhenTryResolveFails()
         {
             // Arrange
-            var testRegistrationConvention = new TestRegistrationConvention();
+            var testRegistrationConvention = new TestProbingStrategy();
             IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
             var interfaceToResolve = typeof(IDemoServiceWithNoImplementation);
 
@@ -65,7 +66,7 @@ namespace PlatformAdapter.Tests
         public void ShouldReturnNullWhenTryResolveFailsGeneric()
         {
             // Arrange
-            var testRegistrationConvention = new TestRegistrationConvention();
+            var testRegistrationConvention = new TestProbingStrategy();
             IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
 
             // Act
@@ -79,7 +80,7 @@ namespace PlatformAdapter.Tests
         public void ShouldResolvePlatformSpecificClassTypeForInterface()
         {
             // Arrange
-            var testRegistrationConvention = new TestRegistrationConvention();
+            var testRegistrationConvention = new TestProbingStrategy();
             IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
             var interfaceToResolve = typeof(IDemoService);
 
@@ -94,7 +95,7 @@ namespace PlatformAdapter.Tests
         public void ShouldResolvePlatformSpecificClassTypeForInterfaceGeneric()
         {
             // Arrange
-            var testRegistrationConvention = new TestRegistrationConvention();
+            var testRegistrationConvention = new TestProbingStrategy();
             IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(testRegistrationConvention);
 
             // Act
@@ -104,27 +105,27 @@ namespace PlatformAdapter.Tests
             classType.Should().Be<DemoService>();
         }
 
-        [Fact]
-        public void ShouldOverrideDefaultRegistrationConvention()
-        {
-            // Arrange
-            var registrationConventionMock = new Mock<IRegistrationConvention>();
-            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
-            var interfaceToResolve = typeof(IDemoService);
+        ////[Fact]
+        ////public void ShouldOverrideDefaultRegistrationConvention()
+        ////{
+        ////    // Arrange
+        ////    var registrationConventionMock = new Mock<IProbingStrategy>();
+        ////    IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
+        ////    var interfaceToResolve = typeof(IDemoService);
 
-            // Act
-            probingAdapterResolver.RegistrationConvention = new TestRegistrationConvention();
+        ////    // Act
+        ////    probingAdapterResolver.ProbingStrategy = new TestProbingStrategy();
 
-            // Assert
-            var classType = probingAdapterResolver.ResolveClassType(interfaceToResolve);
-            classType.Should().Be<DemoService>();
-        }
+        ////    // Assert
+        ////    var classType = probingAdapterResolver.ResolveClassType(interfaceToResolve);
+        ////    classType.Should().Be<DemoService>();
+        ////}
 
         [Fact]
         public void ShouldReturnNullWhenTryResolveClassTypeFails()
         {
             // Arrange
-            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultRegistrationConvention which doesnt work with these unit tests
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultProbingStrategy which doesnt work with these unit tests
             var interfaceToResolve = typeof(IDemoService);
 
             // Act
@@ -138,7 +139,7 @@ namespace PlatformAdapter.Tests
         public void ShouldReturnNullWhenTryResolveClassTypeFailsGeneric()
         {
             // Arrange
-            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultRegistrationConvention which doesnt work with these unit tests
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(); // Default ctor uses DefaultProbingStrategy which doesnt work with these unit tests
 
             // Act
             var classType = probingAdapterResolver.TryResolveClassType<IDemoService>();
@@ -148,10 +149,10 @@ namespace PlatformAdapter.Tests
         }
 
         [Fact]
-        public void ShouldThrowPlatformNotSupportedExceptionIfUnableToProbeForPlatformSpecificAssembly()
+        public void ShouldThrowPlatformSpecificAssemblyNotFoundExceptionIfUnableToProbeForPlatformSpecificAssembly()
         {
             // Arrange
-            var registrationConventionMock = new Mock<IRegistrationConvention>();
+            var registrationConventionMock = new Mock<IProbingStrategy>();
             IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
             var interfaceToResolve = typeof(IDemoService);
 
@@ -159,27 +160,56 @@ namespace PlatformAdapter.Tests
             Action resolveAction = () => probingAdapterResolver.ResolveClassType(interfaceToResolve);
 
             // Assert
-            Assert.Throws<PlatformSpecificAssemblyNotFoundException>(resolveAction);
+            var aggregateException = Assert.Throws<AggregateException>(resolveAction);
+            aggregateException.InnerExceptions.Should().HaveCount(1);
+            aggregateException.InnerExceptions.Should().ContainItemsAssignableTo<PlatformSpecificAssemblyNotFoundException>();
         }
 
         [Fact]
-        public void ShouldThrowPlatformNotSupportedExceptionIfUnableToFindTargetClassInAssembly()
+        public void ShouldThrowPlatformSpecificTypeNotFoundExceptionIfUnableToFindTargetClassInAssembly()
         {
             // Arrange
-            var registrationConventionMock = new Mock<IRegistrationConvention>();
-            registrationConventionMock.Setup(registrationConvention => registrationConvention.PlatformNamingConvention(It.IsAny<AssemblyName>()))
-                .Returns((AssemblyName assemblyName) => assemblyName.Name);
-            registrationConventionMock.Setup(registrationConvention => registrationConvention.InterfaceToClassNamingConvention(It.IsAny<Type>()))
-                .Returns((Type t) => "TypeWhichDoesNotExist");
+            var probingStrategy = new Mock<IProbingStrategy>();
+            probingStrategy.Setup(strategy => strategy.PlatformNamingConvention(It.IsAny<AssemblyName>())).Returns((AssemblyName assemblyName) => assemblyName.Name);
+            probingStrategy.Setup(strategy => strategy.InterfaceToClassNamingConvention(It.IsAny<Type>())).Returns((Type t) => "TypeWhichDoesNotExist");
 
-            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(registrationConventionMock.Object);
+
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(probingStrategy.Object);
             var interfaceToResolve = typeof(IDemoServiceWithNoImplementation);
 
             // Act
             Action resolveAction = () => probingAdapterResolver.ResolveClassType(interfaceToResolve);
 
             // Assert
-            Assert.Throws<PlatformSpecificTypeNotFoundException>(resolveAction);
+            var aggregateException = Assert.Throws<AggregateException>(resolveAction);
+            aggregateException.InnerExceptions.Should().HaveCount(1);
+            aggregateException.InnerExceptions.ElementAt(0).Should().BeOfType<PlatformSpecificTypeNotFoundException>();
+        }
+
+        [Fact]
+        public void ShouldThrowMultipleExceptionsIfMoreThanOneProblemOccurs()
+        {
+            // Arrange
+            var probingStrategy1 = new Mock<IProbingStrategy>();
+            probingStrategy1.Setup(strategy => strategy.PlatformNamingConvention(It.IsAny<AssemblyName>())).Returns((AssemblyName assemblyName) => assemblyName.Name + ".NonExistentAssembly");
+            probingStrategy1.Setup(strategy => strategy.InterfaceToClassNamingConvention(It.IsAny<Type>())).Returns((Type t) => "TypeWhichDoesNotExist");
+
+            var probingStrategy2 = new Mock<IProbingStrategy>();
+            probingStrategy2.Setup(strategy => strategy.PlatformNamingConvention(It.IsAny<AssemblyName>())).Returns((AssemblyName assemblyName) => assemblyName.Name);
+            probingStrategy2.Setup(strategy => strategy.InterfaceToClassNamingConvention(It.IsAny<Type>())).Returns((Type t) => "TypeWhichDoesNotExist");
+
+
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(probingStrategy1.Object, probingStrategy2.Object);
+            var interfaceToResolve = typeof(IDemoServiceWithNoImplementation);
+
+            // Act
+            Action resolveAction = () => probingAdapterResolver.ResolveClassType(interfaceToResolve);
+
+            // Assert
+            var aggregateException = Assert.Throws<AggregateException>(resolveAction);
+            aggregateException.InnerExceptions.Should().HaveCount(2); // Because we injected two different probing strategies
+            aggregateException.InnerExceptions.ElementAt(0).Should().BeOfType<PlatformSpecificAssemblyNotFoundException>();
+            aggregateException.InnerExceptions.ElementAt(1).Should().BeOfType<PlatformSpecificTypeNotFoundException>();
         }
     }
 }

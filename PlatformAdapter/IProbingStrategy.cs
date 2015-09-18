@@ -4,10 +4,10 @@ using System.Reflection;
 namespace CrossPlatformAdapter
 {
     /// <summary>
-    /// IRegistrationConvention interface is used to define conversion rules
+    /// IProbingStrategy interface is used to define conversion rules
     /// to convert platform-agnostics to platform-specifics.
     /// </summary>
-    public interface IRegistrationConvention
+    public interface IProbingStrategy
     {
         /// <summary>
         /// Transforms a platform-agnostic assembly name into a platform-specific assembly name.

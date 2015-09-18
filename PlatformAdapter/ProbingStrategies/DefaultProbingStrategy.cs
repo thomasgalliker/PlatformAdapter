@@ -3,18 +3,18 @@ using System.Reflection;
 
 using Guards;
 
-namespace CrossPlatformAdapter
+namespace CrossPlatformAdapter.ProbingStrategies
 {
     /// <summary>
-    /// DefaultRegistrationConvention is a registration convention which adds the string ".Platform"
-    /// to the platform-agnostic assembly name in order to resolve the platform-specific assembly.
-    /// Furthermore, platform-specific types are made of interface type name excluding the leading string "I".
+    /// DefaultProbingStrategy is a registration convention which probes inside the assembly
+    /// where the given interface type was found.
+    /// Platform-specific types are made of interface type name excluding the leading string "I".
     /// </summary>
-    public class DefaultRegistrationConvention : IRegistrationConvention
+    public class DefaultProbingStrategy : IProbingStrategy
     {
         public virtual string PlatformNamingConvention(AssemblyName assemblyName)
         {
-            return string.Format("{0}.Platform", assemblyName.Name);
+            return assemblyName.Name;
         }
 
         public virtual string InterfaceToClassNamingConvention(Type interfaceType)

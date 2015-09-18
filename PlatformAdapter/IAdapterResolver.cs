@@ -112,6 +112,6 @@ namespace CrossPlatformAdapter
         /// The registration convention to be used to translate the given platform-agnostic interface type
         /// into a platform-dependent class type.
         /// </summary>
-        IRegistrationConvention RegistrationConvention { get; set; }
+        //ICollection<IProbingStrategy> ProbingStrategies { get; set; }
     }
 }
