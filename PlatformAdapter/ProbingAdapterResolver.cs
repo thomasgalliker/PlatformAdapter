@@ -16,6 +16,7 @@ namespace CrossPlatformAdapter
     {
         private readonly Func<AssemblyName, Assembly> assemblyLoader;
         private readonly object lockObject = new object();
+        private readonly Dictionary<int, IProbingStrategy> probingStrategies;
 
         /// <summary>
         /// Default constructor.
@@ -37,12 +38,19 @@ namespace CrossPlatformAdapter
             Guard.ArgumentNotNull(() => assemblyLoader);
 
             int index = 0;
-            this.ProbingStrategies = probingStrategies.ToDictionary(strategy => index++, strategy => strategy);
+            this.probingStrategies = probingStrategies.ToDictionary(strategy => index++, strategy => strategy);
             this.assemblyLoader = assemblyLoader;
         }
 
         /// <inheritdoc />
-        public Dictionary<int, IProbingStrategy> ProbingStrategies { get; set; }
+        public void AddProbingStrategy(IProbingStrategy probingStrategy)
+        {
+            lock (this.lockObject)
+            {
+                var newKey = this.probingStrategies.Keys.Max() + 1;
+                this.probingStrategies.Add(newKey, probingStrategy);
+            }
+        }
 
         /// <inheritdoc />
         public TInterface Resolve<TInterface>(params object[] args)
@@ -125,14 +133,14 @@ namespace CrossPlatformAdapter
         private Type DoResolveClassTypeUsingAllStrategies(Type interfaceType, bool throwIfNotFound = true)
         {
             var exceptions = new List<Exception>();
-            foreach (var probingStrategy in this.ProbingStrategies)
+            foreach (var probingStrategy in this.probingStrategies)
             {
-                var resolveResult = this.DoResolveClassType(probingStrategy.Value, interfaceType, throwIfNotFound);
+                var resolveResult = this.DoResolveClassType(probingStrategy.Value, interfaceType);
                 if (resolveResult.IsSuccessful)
                 {
                     return resolveResult.Type;
                 }
-                
+
                 exceptions.Add(resolveResult.Exception);
             }
 
@@ -140,11 +148,11 @@ namespace CrossPlatformAdapter
             {
                 throw new AggregateException(exceptions);
             }
-            
+
             return null;
         }
 
-        private ProbingResult DoResolveClassType(IProbingStrategy probingStrategy, Type interfaceType, bool throwIfNotFound = true)
+        private ProbingResult DoResolveClassType(IProbingStrategy probingStrategy, Type interfaceType)
         {
             Guard.ArgumentNotNull(() => interfaceType);
 
@@ -175,9 +183,9 @@ namespace CrossPlatformAdapter
             string typeName = probingStrategy.InterfaceToClassNamingConvention(interfaceType);
             try
             {
-                 return assembly.GetType(typeName);
+                return assembly.GetType(typeName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //TODO GATH: Trace
             }
@@ -186,7 +194,7 @@ namespace CrossPlatformAdapter
             {
                 return this.GetType().GetTypeInfo().Assembly.GetType(typeName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //TODO GATH: Trace
             }

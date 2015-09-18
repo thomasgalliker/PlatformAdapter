@@ -109,9 +109,9 @@ namespace CrossPlatformAdapter
         Type TryResolveClassType(Type interfaceType);
 
         /// <summary>
-        /// The registration convention to be used to translate the given platform-agnostic interface type
-        /// into a platform-dependent class type.
+        /// Adds a new probing strategy which will be used to lookup platform-specific assemblies/types.
         /// </summary>
-        //ICollection<IProbingStrategy> ProbingStrategies { get; set; }
+        /// <param name="probingStrategy"></param>
+        void AddProbingStrategy(IProbingStrategy probingStrategy);
     }
 }

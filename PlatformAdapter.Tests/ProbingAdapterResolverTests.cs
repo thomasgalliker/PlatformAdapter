@@ -199,7 +199,8 @@ namespace PlatformAdapter.Tests
             probingStrategy2.Setup(strategy => strategy.InterfaceToClassNamingConvention(It.IsAny<Type>())).Returns((Type t) => "TypeWhichDoesNotExist");
 
 
-            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(probingStrategy1.Object, probingStrategy2.Object);
+            IAdapterResolver probingAdapterResolver = new ProbingAdapterResolver(probingStrategy1.Object);
+            probingAdapterResolver.AddProbingStrategy(probingStrategy2.Object);
             var interfaceToResolve = typeof(IDemoServiceWithNoImplementation);
 
             // Act
