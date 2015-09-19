@@ -17,8 +17,17 @@ Use the following command to install PlatformAdapter using NuGet package manager
 You can use this library in any .Net project which is compatible to PCL (e.g. Xamarin Android, iOS, Windows Phone, Windows Store, Universal Apps, etc.) 
 
 ### API Usage 
+#### Register probing strategies
+In order to find platform-specific types based on their platform-independent interface, PlatformAdapter makes use of different strategies. By default, following two strategies are configured:
+- DefaultProbingStrategy: Probes in the path of the current assembly for platform-specific types.
+- PlatformProbingStrategy: Adds ".Platform" to the current assembly name in order to probe for platform-specific types.
+
+You are free to define your own probing strategies. The only thing you need to do is:
+- Create a new class and implement IProbingStrategy
+- Add your implementation of IProbingStrategy to the PlatformAdapter by calling AddProbingStrategy method
+
 #### Resolve a plattform-specific type from an interface 
-If you have an plattform-agnostic interface, e.g. IPhotoCamera, and you want to resolve the .Net System.Type of the implementation for the platform you're running on, issue the following command: 
+If you have a plattform-agnostic interface, e.g. IPhotoCamera, and you want to resolve the .Net System.Type of the implementation for the platform you're running on, issue the following command: 
 
 ``` 
 Type photoCameraType = PlatformAdapter.Current.ResolveClassType<IPhotoCamera>(); 
