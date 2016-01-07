@@ -23,7 +23,7 @@
       - Signed assembly
       - Allows multiple probing strategies to be configured (IRegistrationConvetion renamed to IProbingStrategy)
     </releaseNotes>
-    <copyright>Copyright 2015</copyright>
+    <copyright>Copyright 2016</copyright>
     <language>en-US</language>
     <dependencies>
       <group targetFramework="MonoTouch10">
