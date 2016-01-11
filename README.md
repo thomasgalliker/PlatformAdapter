@@ -43,4 +43,4 @@ Recommendation of the author: It is highly recommended to delegate the taks of d
 
 
 ### License 
-PlatformAdapter is Copyright &copy; 2015 [Thomas Galliker](https://ch.linkedin.com/in/thomasgalliker). Free for non-commercial use. For commercial use please contact the author. 
+PlatformAdapter is Copyright &copy; 2016 [Thomas Galliker](https://ch.linkedin.com/in/thomasgalliker). Free for non-commercial use. For commercial use please contact the author. 
