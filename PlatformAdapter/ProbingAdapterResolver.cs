@@ -168,7 +168,9 @@ namespace CrossPlatformAdapter
                 var platformSpecificAssembly = this.ProbeForPlatformSpecificAssembly(probingStrategy, interfaceType);
                 if (platformSpecificAssembly == null)
                 {
-                    string errorMessage = string.Format("Platform-specific assembly provides an implementation for interface {0} could not be found. Make sure your project references all necessary platform-specific assemblies.", interfaceType.FullName);
+                    string errorMessage = string.Format("ProbingStrategy '{0}' could not find an implementation of interface '{1}' in platform-specific assembly. "
+                                                        + "Make sure your project references all necessary platform-specific assemblies.",
+                                                        probingStrategy.GetType().Name, interfaceType.FullName);
                     return new ProbingResult(new PlatformSpecificAssemblyNotFoundException(errorMessage));
                 }
                 else
@@ -180,7 +182,8 @@ namespace CrossPlatformAdapter
                         return new ProbingResult(classType);
                     }
 
-                    string errorMessage = string.Format("Type {0} which is supposed to implement {1} could not be resolved in assembly {2}.", 
+                    string errorMessage = string.Format("ProbingStrategy '{0}': Type '{1}' which is supposed to implement '{2}' could not be resolved in assembly '{3}'.", 
+                                            probingStrategy.GetType().Name, 
                                             classTypeName, 
                                             interfaceType.FullName,
                                             platformSpecificAssembly.FullName);
